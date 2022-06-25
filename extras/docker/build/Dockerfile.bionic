@@ -1,14 +1,23 @@
 # Run from top of vpp repo with command:
 # docker build -f extras/docker/build/Dockerfile.bionic .
 FROM ubuntu:bionic
-ARG REPO=master
+#ARG REPO=master
+#Using Release 21.10
+ARG REPO=2110
 COPY . /vpp
 WORKDIR /vpp
 RUN apt-get update
 RUN apt-get -y install make sudo git curl
-RUN curl -s https://packagecloud.io/install/repositories/fdio/${REPO}/script.deb.sh |  bash
-RUN apt-get update
-RUN apt-get -y install vpp-dpdk-dev
-RUN UNATTENDED=y make install-dep
-RUN make pkg-deb
+RUN curl -s https://packagecloud.io/install/repositories/fdio/${REPO}/script.deb.sh | sudo bash
+RUN apt-get -y install vpp-ext-deps && apt-get update
+RUN cd /vpp && export UNATTENDED=y && make install-dep && make pkg-deb
+RUN sudo mkdir /debs && mkdir /debs/binary && \
+    sudo cp -rf /vpp/build-root/*.deb /debs && \
+    sudo mv /debs/vpp_21.10*.deb /debs/binary && \
+    sudo mv /debs/vpp-plugin-*.deb /debs/binary && \
+    sudo mv /debs/python3-vpp-api*.deb /debs/binary
+RUN mv /debs /vpp/
+RUN sudo ls -ltra /vpp/debs
+RUN sudo ls -ltra /vpp/debs/binary
+RUN sudo apt install -y /vpp/debs/*.deb
 CMD ["/bin/bash"]
