@@ -781,6 +781,8 @@ send_ipsec_sa_details (ipsec_sa_t * sa, void *arg)
 {
   ipsec_dump_walk_ctx_t *ctx = arg;
   vl_api_ipsec_sa_details_t *mp;
+  u32 sa_id = 0;
+  vlib_counter_t counts;
 
   mp = vl_msg_api_alloc (sizeof (*mp));
   clib_memset (mp, 0, sizeof (*mp));
@@ -836,6 +838,11 @@ send_ipsec_sa_details (ipsec_sa_t * sa, void *arg)
     mp->replay_window = clib_host_to_net_u64 (sa->replay_window);
 
   mp->stat_index = clib_host_to_net_u32 (sa->stat_index);
+
+  sa_id = sa - ipsec_sa_pool;
+  vlib_get_combined_counter (&ipsec_sa_counters, sa_id, &counts);
+  mp->bytes = clib_host_to_net_u64(counts.bytes);
+  mp->packets  = clib_host_to_net_u64(counts.packets);
 
   vl_api_send_msg (ctx->reg, (u8 *) mp);
 

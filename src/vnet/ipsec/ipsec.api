@@ -441,6 +441,8 @@ define ipsec_sa_v3_dump
     @param last_seq_hi - high 32 bits of highest ESN received inbound
     @param replay_window - bit map of seq nums received relative to last_seq if using anti-replay
     @param stat_index - index for the SA in the stats segment @ /net/ipsec/sa
+    @param bytes - Number of bytes for the SA in the stats segment @ /net/ipsec/sa
+    @param packets - Number of packets for the SA in the stats segment @ /net/ipsec/sa
 */
 define ipsec_sa_details {
   option deprecated;
@@ -454,6 +456,8 @@ define ipsec_sa_details {
   u64 replay_window;
 
   u32 stat_index;
+  u64 bytes;
+  u64 packets;
 };
 define ipsec_sa_v2_details {
   u32 context;
